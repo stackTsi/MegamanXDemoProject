@@ -1,0 +1,79 @@
+{
+  "name": "testMap",
+  "ogmoVersion": "3.3.0",
+  "levelPaths": ["."],
+  "backgroundColor": "#282c34ff",
+  "gridColor": "#3c4049cc",
+  "anglesRadians": true,
+  "directoryDepth": 5,
+  "layerGridDefaultSize": {"x": 8, "y": 8},
+  "levelDefaultSize": {"x": 320, "y": 240},
+  "levelMinSize": {"x": 640, "y": 480},
+  "levelMaxSize": {"x": 4096, "y": 4096},
+  "levelValues": [],
+  "defaultExportMode": ".json",
+  "compactExport": false,
+  "externalScript": "",
+  "playCommand": "",
+  "entityTags": [],
+  "layers": [
+    {
+      "definition": "tile",
+      "name": "ground",
+      "gridSize": {"x": 32, "y": 32},
+      "exportID": "04780665",
+      "exportMode": 0,
+      "arrayMode": 0,
+      "defaultTileset": "New Tileset"
+    },
+    {
+      "definition": "entity",
+      "name": "entities",
+      "gridSize": {"x": 32, "y": 32},
+      "exportID": "04786049",
+      "requiredTags": [],
+      "excludedTags": []
+    }
+  ],
+  "entities": [
+    {
+      "exportID": "04793469",
+      "name": "X",
+      "limit": -1,
+      "size": {"x": 35, "y": 35},
+      "origin": {"x": 0, "y": 0},
+      "originAnchored": true,
+      "shape": {
+        "label": "Rectangle",
+        "points": [
+          {"x": -1, "y": -1},
+          {"x": 1, "y": -1},
+          {"x": -1, "y": 1},
+          {"x": 1, "y": -1},
+          {"x": -1, "y": 1},
+          {"x": 1, "y": 1}
+        ]
+      },
+      "color": "#ff0000ff",
+      "tileX": false,
+      "tileY": false,
+      "tileSize": {"x": 35, "y": 35},
+      "resizeableX": false,
+      "resizeableY": false,
+      "rotatable": false,
+      "rotationDegrees": 360,
+      "canFlipX": false,
+      "canFlipY": false,
+      "canSetColor": false,
+      "hasNodes": false,
+      "nodeLimit": 0,
+      "nodeDisplay": 0,
+      "nodeGhost": true,
+      "tags": [],
+      "values": []
+    }
+  ],
+  "tilesets": [
+    {"label": "New Tileset", "path": "../images/testTerrain.png", "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAAAgCAYAAACinX6EAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAIGNIUk0AAHolAACAgwAA+f8AAIDpAAB1MAAA6mAAADqYAAAXb5JfxUYAAANYSURBVHjazFihltswEJzkBQQaqsxlPuayHEuZywJTdv2Dwh7sH7R/EHgwZYaBKRMUFBQ0DEuBb5X1euXklVgiiSVZ3hntjna1uF6vmLN9+rh4yICNMQAA1wV0F31OsQaqop93DiH2dZf+d2MqAEB36eC6fnwxNwGfnxbXqjDRIKAHUawLdJcugv6fVhUGrQ/v4E3s5+utMHO77UpAU1axX4KneY+2c3BJ4shLsvCAP6/fRgZY69S5dT0mITX33nvZEPDzy/M1Zai1LvYRUOd9v4tlOQnsEWKyIYAD0Qy/N/7IfOc9qrIcjFvr5ifg7+/XawgB1jo0zVadE0LA9mUH154RwjCuzbu4Vc0Gp8Nx8AwgvrN92cVnPp6FBljrBjv0/dcPAMDpcIw7WNdVBMEbAaRwofm0Bp/XtqfoDftdA2PM/KcAgefxfTocR2CtdZD+cToc1bBw3sO15+gVfJy+0RMGLJFJ86GDD11y3HkfAT8ifCGE6O58DfqG8x7WuvkJIKMcLgMgfOf4rhEoCU6Saa0b6YX27WUOO1+aAo0xcLjEHZJuTf20sylwRBatwUmkb5HW+NDNT0BpikkQ2n8OXjsWS1OM3uPgaaw0xfwiSLvhvEeFtQqcE6UlR9p8Le4171vlIIB8h0gMCTAZT88poClSpZdRH62bjQhyPeCnQmkKNUzkGgSafuV//sw9YpWLCEp35/08bnvj/eTOayEynHMjfZWDCEqXleAJkPN+RI4kMFUgjYsnn8cpwA0jIgjQftcM0tupk+PekZjyltlrga9PH6IB+10TCxztnOdps1T2ZlOrwKUOcMHNIgS4oYZdW2n3AlzsuA5wMrQwqutKkHp7N4tMkBpVaykSZBzz3XXej8Dz+anMMZtiiAtYylgpcFqSI8EbY6KGyLI7m1NAXn5oV2L8aNN0gCdMVVkOLlc0Ic2GAClSUgA5YE6EluVpKS9fS947ZCWCmsH3QqDZ1LHv7dgOyJgqmHhitUTmjQyV4KcEUbsk4bfJWYqgrOOnjE5lfCkSUkVSdh7ALzDejm0ihb2d61NkaqInM8MsUmHtOJuq4a11I/AphZeepJGQVTncnu3del/LFaQWyARJC5Fs7gPoKLtX91N4TLk+J2SqKuTH578BAIp3tUMy9JDGAAAAAElFTkSuQmCC", "tileWidth": 32, "tileHeight": 32, "tileSeparationX": 0, "tileSeparationY": 0}
+  ]
+}
