@@ -18,11 +18,13 @@ class PlayState extends FlxState
 		map = new FlxOgmo3Loader(AssetPaths.testMap__ogmo, AssetPaths.testStage__json);
 		ground = map.loadTilemap(AssetPaths.testTerrain__png, "ground");
 		ground.follow();
-		ground.setTileProperties(1, FlxObject.UP);
+		ground.setTileProperties(1, FlxObject.ANY);
+
+		add(ground);
+
 		player = new Player();
 		map.loadEntities(placeEntities, "entities");
 		add(player);
-		add(ground);
 	}
 
 	function placeEntities(entity:EntityData)

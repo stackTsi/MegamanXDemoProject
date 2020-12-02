@@ -67,6 +67,6 @@
 --macro flixel.system.macros.FlxDefines.run()
 --connect
 6000
--js export/html5/bin/XProject.js
+-js export/html5/bin/XPlatformer.js
 -cp export/html5/haxe
 -D html5

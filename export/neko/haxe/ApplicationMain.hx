@@ -15,11 +15,11 @@ class ApplicationMain
 	#if !macro
 	public static function main()
 	{
-		lime.system.System.__registerEntryPoint("XProject", create);
+		lime.system.System.__registerEntryPoint("XPlatformer", create);
 
 		#if (js && html5)
 		#if (munit || utest)
-		lime.system.System.embed("XProject", null, 640, 480);
+		lime.system.System.embed("XPlatformer", null, 640, 480);
 		#end
 		#else
 		create(null);
@@ -32,10 +32,10 @@ class ApplicationMain
 
 		ManifestResources.init(config);
 
-		app.meta["build"] = "151";
+		app.meta["build"] = "1";
 		app.meta["company"] = "HaxeFlixel";
-		app.meta["file"] = "XProject";
-		app.meta["name"] = "Megaman X: ";
+		app.meta["file"] = "XPlatformer";
+		app.meta["name"] = "Megaman X";
 		app.meta["packageName"] = "com.example.myapp";
 		app.meta["version"] = "0.0.1";
 
@@ -57,7 +57,7 @@ class ApplicationMain
 			minimized: false,
 			parameters: {},
 			resizable: true,
-			title: "Megaman X: ",
+			title: "Megaman X",
 			width: 640,
 			x: null,
 			y: null,

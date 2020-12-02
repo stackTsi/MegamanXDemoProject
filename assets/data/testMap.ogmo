@@ -1,15 +1,15 @@
 {
-  "name": "testMap",
+  "name": "MMXtestMap",
   "ogmoVersion": "3.3.0",
   "levelPaths": ["."],
   "backgroundColor": "#282c34ff",
   "gridColor": "#3c4049cc",
   "anglesRadians": true,
   "directoryDepth": 5,
-  "layerGridDefaultSize": {"x": 8, "y": 8},
+  "layerGridDefaultSize": {"x": 16, "y": 16},
   "levelDefaultSize": {"x": 320, "y": 240},
   "levelMinSize": {"x": 640, "y": 480},
-  "levelMaxSize": {"x": 4096, "y": 4096},
+  "levelMaxSize": {"x": 640, "y": 480},
   "levelValues": [],
   "defaultExportMode": ".json",
   "compactExport": false,
@@ -18,28 +18,28 @@
   "entityTags": [],
   "layers": [
     {
+      "definition": "entity",
+      "name": "entities",
+      "gridSize": {"x": 35, "y": 35},
+      "exportID": "89683818",
+      "requiredTags": [],
+      "excludedTags": []
+    },
+    {
       "definition": "tile",
       "name": "ground",
       "gridSize": {"x": 32, "y": 32},
-      "exportID": "04780665",
+      "exportID": "89681474",
       "exportMode": 0,
       "arrayMode": 0,
       "defaultTileset": "New Tileset"
-    },
-    {
-      "definition": "entity",
-      "name": "entities",
-      "gridSize": {"x": 32, "y": 32},
-      "exportID": "04786049",
-      "requiredTags": [],
-      "excludedTags": []
     }
   ],
   "entities": [
     {
-      "exportID": "04793469",
+      "exportID": "89684883",
       "name": "X",
-      "limit": -1,
+      "limit": 1,
       "size": {"x": 35, "y": 35},
       "origin": {"x": 0, "y": 0},
       "originAnchored": true,
