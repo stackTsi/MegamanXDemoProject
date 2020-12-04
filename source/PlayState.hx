@@ -5,6 +5,7 @@ import flixel.FlxObject;
 import flixel.FlxState;
 import flixel.addons.editors.ogmo.FlxOgmo3Loader;
 import flixel.tile.FlxTilemap;
+import haxe.display.JsonModuleTypes.JsonModulePath;
 
 class PlayState extends FlxState
 {
@@ -39,5 +40,15 @@ class PlayState extends FlxState
 	{
 		super.update(elapsed);
 		FlxG.collide(player, ground);
+
+		if (player.isTouching(FlxObject.DOWN))
+		{
+			if (FlxG.keys.justPressed.UP)
+			{
+				{
+					player.velocity.y = -8800;
+				}
+			}
+		}
 	}
 }

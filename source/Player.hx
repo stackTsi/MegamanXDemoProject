@@ -51,11 +51,26 @@ class Player extends FlxSprite
 		{
 			animation.play("idle");
 		}
+
+		{
+			/*if (FlxG.keys.justPressed.UP)
+				{
+					var jumpCount:Int = 0;
+					while (jumpCount == 0)
+					{
+						velocity.y = -JUMP_SPEED * 40;
+						jumpCount = 1;
+					}
+			}*/
+		}
 	}
 
 	override function update(elapsed:Float)
 	{
 		updateMovement();
+		// FlxG.collide(, ground);
+		// if (X.isTouching(FlxObject.DOWN)) {}
+
 		super.update(elapsed);
 	}
 }
