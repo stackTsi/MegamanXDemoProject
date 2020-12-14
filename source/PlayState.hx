@@ -24,6 +24,7 @@ class PlayState extends FlxState
 
 		player = new Player();
 		map.loadEntities(placeEntities, "entities");
+		FlxG.camera.follow(player, TOPDOWN_TIGHT); // set camera to follow player
 		add(player);
 	}
 
