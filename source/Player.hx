@@ -7,7 +7,7 @@ import flixel.FlxSprite;
 class Player extends FlxSprite
 {
 	private static inline var SPEED:Float = 115; // set the default movement speed
-	private static inline var GRAVITY:Float = 980; // set "gravity" physics
+	private static inline var GRAVITY:Float = 700; // set "gravity" physics
 	private static inline var JUMP_SPEED:Float = 200; // set default jump speed
 
 	private var _jumpTime:Float;
@@ -24,18 +24,14 @@ class Player extends FlxSprite
 		animation.add("walking", [4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 23, false);
 		animation.add("jumping", [14, 15, 16, 17, 18, 19, 20]);
 		setSize(32, 32);
-		offset.set(0, -3);
 
 		drag.x = SPEED * 80; // * slow down object while move input is not pressed *
-		acceleration.y = 2 * GRAVITY;
-		maxVelocity.x = SPEED;
-		maxVelocity.y = JUMP_SPEED;
+		acceleration.y = 1.5 * GRAVITY;
+		maxVelocity.set(SPEED, JUMP_SPEED);
 	}
 
 	function updateMovement()
 	{
-		acceleration.x = 0; // reset to 0 if no button is pushed
-
 		// _______________________________/*Basic Movements*/______________________________________//
 		if (FlxG.keys.anyPressed([LEFT]))
 		{
@@ -57,32 +53,39 @@ class Player extends FlxSprite
 		{
 			animation.play("idle");
 		}
-		if (FlxG.keys.anyPressed([X]))
+		// /*________________________JUMP(Prototype)_______________________*/
+		if (FlxG.keys.anyJustPressed([X]))
 		{
-			_jumpTime += FlxG.elapsed; // set jumpTime = amount of time in seconds passed since last frame
+			if (velocity.y == 0) // if in any case vertical velocity = 0, the jumptime counter resets
+			{ // this helps to control the jump allowed if the player releases the
+				_jumpTime = 0; // button mid-jump time.
+			}
+		}
 
-			if (_jumpTime > 0.25)
+		if ((FlxG.keys.anyPressed([X])) && (_jumpTime >= 0))
+		{
+			_jumpTime += FlxG.elapsed;
+			if (_jumpTime > 0.125) // can only jump for 0.125 second before start to descends
 			{
 				_jumpTime = -1;
 			}
 			else if (_jumpTime > 0)
 			{
-				velocity.y = -1.3 * JUMP_SPEED;
+				velocity.y = -1.4 * JUMP_SPEED;
 			}
-			else
-				_jumpTime = -1;
 		}
-		if (this.isTouching(FlxObject.DOWN))
+		else
+			_jumpTime = -1;
+
+		if (isTouching(FlxObject.DOWN) && !FlxG.keys.anyPressed([X])) // remove the jump counter if not pressing jump button
 		{
-			if (!FlxG.keys.anyPressed([X]))
-			{
-				_jumpTime = 0;
-			}
+			_jumpTime = -1;
 		}
 	}
 
 	override function update(elapsed:Float)
 	{
+		acceleration.x = 0; // reset any horizontal movement to 0 if no button is pushed
 		updateMovement();
 
 		super.update(elapsed);

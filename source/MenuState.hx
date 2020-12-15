@@ -11,7 +11,7 @@ class MenuState extends FlxState
 	override public function create()
 	{
 		playButton = new FlxButton(0, 0, "Play", clickPlay);
-		add(playButton);
+		add(playButton);		
 		playButton.screenCenter();
 		super.create();
 	}
