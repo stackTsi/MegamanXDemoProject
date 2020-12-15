@@ -22,13 +22,14 @@ class Player extends FlxSprite
 		animation.add("idle", [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 10, true);
 		animation.add("step", [3]);
 		animation.add("walking", [4, 5, 6, 7, 8, 9, 10, 11, 12, 13], 23, false);
-		animation.add("jumping_up", [15, 16, 17], 10);
-		animation.add("jumping_down", [17, 18, 19]);
+		animation.add("jumping_up", [16], 23, false);
+		animation.add("jumping_down", [17, 18, 19], 23, false);
 		setSize(32, 32); // hitbox for x
-		offset.set(3, 3); // hitbox for x
+		offset.set(2, 2); // hitbox for x
 
 		drag.x = SPEED * 80; // * slow down object while move input is not pressed *
-		acceleration.y = 1.5 * GRAVITY;
+
+		acceleration.y = 1.5 * GRAVITY; // always falls down
 		maxVelocity.set(SPEED, JUMP_SPEED);
 	}
 
@@ -67,7 +68,7 @@ class Player extends FlxSprite
 		if ((FlxG.keys.anyPressed([X])) && (_jumpTime >= 0))
 		{
 			_jumpTime += FlxG.elapsed;
-			if (_jumpTime > 0.125) // can only jump for 0.125 second before start to descends
+			if (_jumpTime > 0.225) // can only jump for 0.125 second before start to descends
 			{
 				_jumpTime = -1;
 			}
@@ -96,6 +97,7 @@ class Player extends FlxSprite
 	override function update(elapsed:Float)
 	{
 		acceleration.x = 0; // reset any horizontal movement to 0 if no button is pushed
+
 		updateMovement();
 
 		super.update(elapsed);
