@@ -18,7 +18,7 @@ class PlayState extends FlxState
 		map = new FlxOgmo3Loader(AssetPaths.testMap__ogmo, AssetPaths.testStage__json);
 		ground = map.loadTilemap(AssetPaths.testTerrain__png, "ground");
 		ground.follow();
-		ground.setTileProperties(1, FlxObject.ANY);
+		ground.setTileProperties(1, FlxObject.CEILING);
 
 		add(ground);
 
