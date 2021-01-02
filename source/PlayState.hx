@@ -1,9 +1,11 @@
 package;
 
+import MHCores.MHCore;
 import flixel.FlxG;
 import flixel.FlxObject;
 import flixel.FlxState;
 import flixel.addons.editors.ogmo.FlxOgmo3Loader;
+import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.tile.FlxTilemap;
 
 class PlayState extends FlxState
@@ -11,21 +13,26 @@ class PlayState extends FlxState
 	var player:Player;
 	var map:FlxOgmo3Loader;
 	var ground:FlxTilemap;
+	var mhcore:FlxTypedGroup<MHCore>;
 
 	override public function create()
 	{
 		super.create();
+
 		map = new FlxOgmo3Loader(AssetPaths.testMap__ogmo, AssetPaths.testStage__json);
 		ground = map.loadTilemap(AssetPaths.testTerrain__png, "ground");
 		ground.follow();
-		ground.setTileProperties(1, FlxObject.CEILING);
+		ground.setTileProperties(1, FlxObject.ANY);
 
-		add(ground);
+		mhcore = new FlxTypedGroup<MHCore>();
 
 		player = new Player();
 		map.loadEntities(placeEntities, "entities");
 		FlxG.camera.follow(player, TOPDOWN_TIGHT); // set camera to follow player
+
+		add(ground);
 		add(player);
+		add(mhcore);
 	}
 
 	function placeEntities(entity:EntityData)
@@ -34,11 +41,25 @@ class PlayState extends FlxState
 		{
 			player.setPosition(entity.x, entity.y);
 		}
+		else if (entity.name == "MH_Core")
+		{
+			mhcore.add(new MHCore(entity.x + 8, entity.y));
+		}
+	}
+
+	function itemTouched(player:Player, mhcore:MHCore)
+	{
+		if (player.alive && player.exists && mhcore.alive && mhcore.exists)
+		{
+			mhcore.kill();
+		}
 	}
 
 	override public function update(elapsed:Float)
 	{
 		super.update(elapsed);
 		FlxG.collide(player, ground);
+		FlxG.collide(mhcore, ground);
+		FlxG.overlap(player, mhcore, itemTouched);
 	}
 }

@@ -23,7 +23,8 @@ class Player extends FlxSprite
 		animation.add("idle", [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 11, true);
 		animation.add("walking", [3], 22, false);
 		animation.add("jump", [14, 15, 16], 16, false);
-		animation.add("fall", [17, 18], 8, false);
+		animation.add("fall", [17], 8);
+		animation.add("land", [19, 20, 21], 8, false);
 		// hitbox settings
 		setSize(15, 28);
 		offset.set(16, 15);
@@ -53,13 +54,18 @@ class Player extends FlxSprite
 			animation.append("walking", [4, 5, 6, 7, 8, 9, 10, 11, 12, 13]);
 			animation.play("walking");
 		}
-		if (velocity.x == 0 && velocity.y == 0)
+		if (velocity.x == 0 && velocity.y == 0 && isTouching(FlxObject.DOWN))
 		{
 			animation.play("idle");
 		}
-		if (velocity.y > 0 && !isTouching(FlxObject.DOWN)) //
+		if (velocity.y > 0) //
 		{
+			animation.append("fall", [18]);
 			animation.play("fall");
+			if (velocity.y == 0 && isTouching(FlxObject.DOWN))
+			{
+				animation.play("land");
+			}
 		}
 		// /*________________________JUMP (WIP)_______________________*/
 
@@ -74,18 +80,18 @@ class Player extends FlxSprite
 		if ((FlxG.keys.anyPressed([X])) && (_jumpTime >= 0))
 		{
 			_jumpTime += FlxG.elapsed;
-			if (_jumpTime > 0.20) // can only jump for 0.25 second before start to descends
+			if (_jumpTime > 0.25 || isTouching(FlxObject.UP))
 			{
 				_jumpTime = -1;
 			}
 			else if (_jumpTime > 0)
 			{
-				velocity.y = -0.8 * JUMP_SPEED;
+				velocity.y = -0.75 * JUMP_SPEED;
 			}
 		}
 		else
 			_jumpTime = -1;
-		if (isTouching(FlxObject.DOWN) && !FlxG.keys.anyPressed([X])) // remove the jump counter if not pressing jump button and grounded
+		if (isTouching(FlxObject.DOWN) && !FlxG.keys.anyJustPressed([X])) // remove jump counter if key not pressed and player is grounded
 		{
 			_jumpTime = -1;
 		}
