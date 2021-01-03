@@ -6,12 +6,15 @@ import flixel.FlxSprite;
 
 class Player extends FlxSprite
 {
-	private static inline var SPEED:Float = 100; // set the default movement speed
+	private static inline var SPEED:Float = 150; // set the default movement speed
+	private static inline var DASH_SPEED:Float = 450;
 	private static inline var GRAVITY:Float = 650; // set "gravity" physics
 	private static inline var JUMP_SPEED:Float = 220; // set default jump speed
 
-	private var _jumpTime:Float;
-	private var _dashTime:Float;
+	var _jumpTime:Float;
+	var _dashTime:Float;
+
+	public var parent:PlayState;
 
 	public function new(x:Float = 0, y:Float = 0)
 	{
@@ -23,13 +26,14 @@ class Player extends FlxSprite
 		animation.add("idle", [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], 11, true);
 		animation.add("walking", [3], 22, false);
 		animation.add("jump", [14, 15, 16], 16, false);
-		animation.add("fall", [17], 8);
-		animation.add("land", [19, 20, 21], 8, false);
+		animation.add("fall", [17], 12);
+		// animation.add("land", [19, 20, 21], 8, false); [WIP]
+		animation.add("dash", [41], 8);
 		// hitbox settings
 		setSize(15, 28);
 		offset.set(16, 15);
 
-		drag.x = SPEED * 80; // * slow down object while move input is not pressed *
+		drag.x = SPEED * 36; // * slow down object while move input is not pressed *
 		acceleration.y = 1.5 * GRAVITY;
 		maxVelocity.set(SPEED, 0);
 	}
@@ -41,15 +45,15 @@ class Player extends FlxSprite
 		if (FlxG.keys.anyPressed([LEFT]))
 		{
 			facing = FlxObject.LEFT;
-			acceleration.x = -drag.x;
+			velocity.x = -SPEED;
 		}
 		if (FlxG.keys.anyPressed([RIGHT]))
 		{
 			facing = FlxObject.RIGHT;
-			acceleration.x = drag.x;
+			velocity.x = SPEED;
 		}
 
-		if (Math.abs(acceleration.x) > 0 && velocity.y == 0)
+		if (Math.abs(velocity.x) == SPEED && velocity.y == 0)
 		{
 			animation.append("walking", [4, 5, 6, 7, 8, 9, 10, 11, 12, 13]);
 			animation.play("walking");
@@ -94,6 +98,51 @@ class Player extends FlxSprite
 		if (isTouching(FlxObject.DOWN) && !FlxG.keys.anyJustPressed([X])) // remove jump counter if key not pressed and player is grounded
 		{
 			_jumpTime = -1;
+		}
+
+		// /*_______________________DASH [WIP]_________________________*/
+		if (FlxG.keys.anyJustPressed([Z]) && isTouching(FlxObject.DOWN))
+		{
+			_dashTime = 0;
+		}
+		if ((FlxG.keys.anyPressed([Z]) && (_dashTime >= 0)))
+		{
+			// if (acceleration.y == 0)
+			_dashTime += FlxG.elapsed;
+			animation.play("dash"); // [WIP]: lacks animation control
+			if (_dashTime > 0.26) // can only dash for 0.260 second before stop
+			{
+				if (velocity.y != 0) // [WIP]: needs to implement no dash key airborne without losing dash speed
+				{
+					switch (facing)
+					{
+						case FlxObject.LEFT:
+							velocity.x = -DASH_SPEED;
+
+						case FlxObject.RIGHT:
+							velocity.x = DASH_SPEED;
+					}
+				}
+				else
+					_dashTime = -1;
+			}
+			else if (_dashTime > 0)
+			{
+				switch (facing)
+				{
+					case FlxObject.LEFT:
+						velocity.x = -DASH_SPEED;
+
+					case FlxObject.RIGHT:
+						velocity.x = DASH_SPEED;
+				}
+			}
+		}
+		else
+			_dashTime = -1;
+		if (!FlxG.keys.anyPressed([Z]) && velocity.y == 0) // remove the dash counter if not pressing dash and if x is in air
+		{
+			_dashTime = -1;
 		}
 	}
 

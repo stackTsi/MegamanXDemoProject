@@ -1,8 +1,6 @@
 package;
 
 import flixel.FlxSprite;
-import flixel.tweens.FlxEase;
-import flixel.tweens.FlxTween;
 
 class MHCore extends FlxSprite
 {
@@ -15,12 +13,6 @@ class MHCore extends FlxSprite
 		animation.add("idle", [1, 2, 3], 18);
 
 		offset.set(0, -4);
-	}
-
-	override function kill()
-	{
-		alive = false;
-		exists = false;
 	}
 
 	override public function update(elapsed:Float)

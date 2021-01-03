@@ -19,7 +19,7 @@ class ApplicationMain
 
 		#if (js && html5)
 		#if (munit || utest)
-		lime.system.System.embed("XPlatformer", null, 1280, 720);
+		lime.system.System.embed("XPlatformer", null, 640, 480);
 		#end
 		#else
 		create(null);
@@ -32,7 +32,7 @@ class ApplicationMain
 
 		ManifestResources.init(config);
 
-		app.meta["build"] = "5";
+		app.meta["build"] = "6";
 		app.meta["company"] = "HaxeFlixel";
 		app.meta["file"] = "XPlatformer";
 		app.meta["name"] = "Megaman X";
@@ -51,14 +51,14 @@ class ApplicationMain
 			element: null,
 			frameRate: 60,
 			#if !web fullscreen: false, #end
-			height: 720,
+			height: 480,
 			hidden: #if munit true #else false #end,
 			maximized: false,
 			minimized: false,
 			parameters: {},
 			resizable: false,
 			title: "Megaman X",
-			width: 1280,
+			width: 640,
 			x: null,
 			y: null,
 		};

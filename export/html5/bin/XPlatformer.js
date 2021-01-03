@@ -893,13 +893,13 @@ ApplicationMain.main = function() {
 ApplicationMain.create = function(config) {
 	var app = new openfl_display_Application();
 	ManifestResources.init(config);
-	app.meta.h["build"] = "5";
+	app.meta.h["build"] = "6";
 	app.meta.h["company"] = "HaxeFlixel";
 	app.meta.h["file"] = "XPlatformer";
 	app.meta.h["name"] = "Megaman X";
 	app.meta.h["packageName"] = "com.example.myapp";
 	app.meta.h["version"] = "0.0.1";
-	var attributes = { allowHighDPI : false, alwaysOnTop : false, borderless : false, element : null, frameRate : 60, height : 720, hidden : false, maximized : false, minimized : false, parameters : { }, resizable : false, title : "Megaman X", width : 1280, x : null, y : null};
+	var attributes = { allowHighDPI : false, alwaysOnTop : false, borderless : false, element : null, frameRate : 60, height : 480, hidden : false, maximized : false, minimized : false, parameters : { }, resizable : false, title : "Megaman X", width : 640, x : null, y : null};
 	attributes.context = { antialiasing : 0, background : 0, colorDepth : 32, depth : true, hardware : true, stencil : true, type : null, vsync : false};
 	if(app.__window == null) {
 		if(config != null) {
@@ -4505,6 +4505,18 @@ DocumentClass.prototype = $extend(Main.prototype,{
 var AssetPaths = function() { };
 $hxClasses["AssetPaths"] = AssetPaths;
 AssetPaths.__name__ = "AssetPaths";
+var Brain = function(initialState) {
+	this.activeState = initialState;
+};
+$hxClasses["Brain"] = Brain;
+Brain.__name__ = "Brain";
+Brain.prototype = {
+	activeState: null
+	,update: function(elapsed) {
+		this.activeState(elapsed);
+	}
+	,__class__: Brain
+};
 var EReg = function(r,opt) {
 	this.r = new RegExp(r,opt.split("u").join(""));
 };
@@ -4595,89 +4607,9 @@ EReg.prototype = {
 	}
 	,__class__: EReg
 };
-var HxOverrides = function() { };
-$hxClasses["HxOverrides"] = HxOverrides;
-HxOverrides.__name__ = "HxOverrides";
-HxOverrides.strDate = function(s) {
-	switch(s.length) {
-	case 8:
-		var k = s.split(":");
-		var d = new Date();
-		d["setTime"](0);
-		d["setUTCHours"](k[0]);
-		d["setUTCMinutes"](k[1]);
-		d["setUTCSeconds"](k[2]);
-		return d;
-	case 10:
-		var k = s.split("-");
-		return new Date(k[0],k[1] - 1,k[2],0,0,0);
-	case 19:
-		var k = s.split(" ");
-		var y = k[0].split("-");
-		var t = k[1].split(":");
-		return new Date(y[0],y[1] - 1,y[2],t[0],t[1],t[2]);
-	default:
-		throw haxe_Exception.thrown("Invalid date format : " + s);
-	}
-};
-HxOverrides.cca = function(s,index) {
-	var x = s.charCodeAt(index);
-	if(x != x) {
-		return undefined;
-	}
-	return x;
-};
-HxOverrides.substr = function(s,pos,len) {
-	if(len == null) {
-		len = s.length;
-	} else if(len < 0) {
-		if(pos == 0) {
-			len = s.length + len;
-		} else {
-			return "";
-		}
-	}
-	return s.substr(pos,len);
-};
-HxOverrides.remove = function(a,obj) {
-	var i = a.indexOf(obj);
-	if(i == -1) {
-		return false;
-	}
-	a.splice(i,1);
-	return true;
-};
-HxOverrides.now = function() {
-	return Date.now();
-};
-var IntIterator = function(min,max) {
-	this.min = min;
-	this.max = max;
-};
-$hxClasses["IntIterator"] = IntIterator;
-IntIterator.__name__ = "IntIterator";
-IntIterator.prototype = {
-	min: null
-	,max: null
-	,hasNext: function() {
-		return this.min < this.max;
-	}
-	,next: function() {
-		return this.min++;
-	}
-	,__class__: IntIterator
-};
-var Lambda = function() { };
-$hxClasses["Lambda"] = Lambda;
-Lambda.__name__ = "Lambda";
-Lambda.array = function(it) {
-	var a = [];
-	var i = $getIterator(it);
-	while(i.hasNext()) {
-		var i1 = i.next();
-		a.push(i1);
-	}
-	return a;
+var EnemyType = $hxEnums["EnemyType"] = { __ename__ : "EnemyType", __constructs__ : ["MINIONS","OVERSEER"]
+	,MINIONS: {_hx_index:0,__enum__:"EnemyType",toString:$estr}
+	,OVERSEER: {_hx_index:1,__enum__:"EnemyType",toString:$estr}
 };
 var flixel_util_IFlxDestroyable = function() { };
 $hxClasses["flixel.util.IFlxDestroyable"] = flixel_util_IFlxDestroyable;
@@ -7317,6 +7249,139 @@ flixel_FlxSprite.prototype = $extend(flixel_FlxObject.prototype,{
 	,__class__: flixel_FlxSprite
 	,__properties__: $extend(flixel_FlxObject.prototype.__properties__,{set_clipRect:"set_clipRect",set_color:"set_color",set_blend:"set_blend",set_flipY:"set_flipY",set_flipX:"set_flipX",set_facing:"set_facing",set_alpha:"set_alpha",set_graphic:"set_graphic",set_frames:"set_frames",set_frame:"set_frame",set_pixels:"set_pixels",get_pixels:"get_pixels",set_antialiasing:"set_antialiasing",set_useFramePixels:"set_useFramePixels"})
 });
+var Enemy = function(x,y,type) {
+	flixel_FlxSprite.call(this,x,y);
+	this.type = type;
+	this.brain = new Brain($bind(this,this.idle));
+	this.idleTime = 0;
+	var point = flixel_math_FlxPoint._pool.get().set(0,0);
+	point._inPool = false;
+	this.playerPosition = point;
+	var point = flixel_math_FlxPoint._pool.get().set(0,0);
+	point._inPool = false;
+	this.enemyPosition = point;
+	var graphic = type == EnemyType.OVERSEER ? "assets/images/baDbone.png" : "assets/images/batton.png";
+	this.loadGraphic(graphic,true,50,30);
+	this.animation.add("idle",[3]);
+	this.animation.add("moving",[4,5,6,7],13,true);
+	this.setSize(20,20);
+	this.offset.set(16,4);
+};
+$hxClasses["Enemy"] = Enemy;
+Enemy.__name__ = "Enemy";
+Enemy.__super__ = flixel_FlxSprite;
+Enemy.prototype = $extend(flixel_FlxSprite.prototype,{
+	type: null
+	,brain: null
+	,idleTime: null
+	,moveDirection: null
+	,seesPlayer: null
+	,playerPosition: null
+	,enemyPosition: null
+	,idle: function(elapsed) {
+		if(this.seesPlayer) {
+			this.brain.activeState = $bind(this,this.chase);
+		} else {
+			var tmp = this.velocity.y == 0;
+		}
+	}
+	,chase: function(elapsed) {
+		if(!this.seesPlayer) {
+			this.brain.activeState = $bind(this,this.idle);
+		} else {
+			flixel_math_FlxVelocity.moveTowardsPoint(this,this.playerPosition,60);
+		}
+	}
+	,update: function(elapsed) {
+		flixel_FlxSprite.prototype.update.call(this,elapsed);
+		this.brain.update(elapsed);
+	}
+	,__class__: Enemy
+});
+var HxOverrides = function() { };
+$hxClasses["HxOverrides"] = HxOverrides;
+HxOverrides.__name__ = "HxOverrides";
+HxOverrides.strDate = function(s) {
+	switch(s.length) {
+	case 8:
+		var k = s.split(":");
+		var d = new Date();
+		d["setTime"](0);
+		d["setUTCHours"](k[0]);
+		d["setUTCMinutes"](k[1]);
+		d["setUTCSeconds"](k[2]);
+		return d;
+	case 10:
+		var k = s.split("-");
+		return new Date(k[0],k[1] - 1,k[2],0,0,0);
+	case 19:
+		var k = s.split(" ");
+		var y = k[0].split("-");
+		var t = k[1].split(":");
+		return new Date(y[0],y[1] - 1,y[2],t[0],t[1],t[2]);
+	default:
+		throw haxe_Exception.thrown("Invalid date format : " + s);
+	}
+};
+HxOverrides.cca = function(s,index) {
+	var x = s.charCodeAt(index);
+	if(x != x) {
+		return undefined;
+	}
+	return x;
+};
+HxOverrides.substr = function(s,pos,len) {
+	if(len == null) {
+		len = s.length;
+	} else if(len < 0) {
+		if(pos == 0) {
+			len = s.length + len;
+		} else {
+			return "";
+		}
+	}
+	return s.substr(pos,len);
+};
+HxOverrides.remove = function(a,obj) {
+	var i = a.indexOf(obj);
+	if(i == -1) {
+		return false;
+	}
+	a.splice(i,1);
+	return true;
+};
+HxOverrides.now = function() {
+	return Date.now();
+};
+var IntIterator = function(min,max) {
+	this.min = min;
+	this.max = max;
+};
+$hxClasses["IntIterator"] = IntIterator;
+IntIterator.__name__ = "IntIterator";
+IntIterator.prototype = {
+	min: null
+	,max: null
+	,hasNext: function() {
+		return this.min < this.max;
+	}
+	,next: function() {
+		return this.min++;
+	}
+	,__class__: IntIterator
+};
+var Lambda = function() { };
+$hxClasses["Lambda"] = Lambda;
+Lambda.__name__ = "Lambda";
+Lambda.array = function(it) {
+	var a = [];
+	var i = $getIterator(it);
+	while(i.hasNext()) {
+		var i1 = i.next();
+		a.push(i1);
+	}
+	return a;
+};
 var MHCore = function(x,y) {
 	flixel_FlxSprite.call(this,x,y);
 	this.loadGraphic("assets/images/mHCore.png",true,16,12);
@@ -7327,11 +7392,7 @@ $hxClasses["MHCore"] = MHCore;
 MHCore.__name__ = "MHCore";
 MHCore.__super__ = flixel_FlxSprite;
 MHCore.prototype = $extend(flixel_FlxSprite.prototype,{
-	kill: function() {
-		this.set_alive(false);
-		this.set_exists(false);
-	}
-	,update: function(elapsed) {
+	update: function(elapsed) {
 		this.acceleration.set_y(650);
 		this.animation.play("idle",false,true);
 		flixel_FlxSprite.prototype.update.call(this,elapsed);
@@ -7357,7 +7418,7 @@ ManifestResources.init = function(config) {
 	openfl_text_Font.registerFont(_$_$ASSET_$_$OPENFL_$_$flixel_$fonts_$nokiafc22_$ttf);
 	openfl_text_Font.registerFont(_$_$ASSET_$_$OPENFL_$_$flixel_$fonts_$monsterrat_$ttf);
 	var bundle;
-	var data = "{\"name\":null,\"assets\":\"aoy4:pathy34:assets%2Fdata%2Fdata-goes-here.txty4:sizezy4:typey4:TEXTy2:idR1y7:preloadtgoR0y28:assets%2Fdata%2FtestMap.ogmoR2i4199R3R4R5R7R6tgoR0y30:assets%2Fdata%2FtestStage.jsonR2i4934R3R4R5R8R6tgoR0y36:assets%2Fimages%2Fimages-go-here.txtR2zR3R4R5R9R6tgoR0y28:assets%2Fimages%2FmHCore.pngR2i444R3y5:IMAGER5R10R6tgoR0y33:assets%2Fimages%2FtestTerrain.pngR2i978R3R11R5R12R6tgoR0y30:assets%2Fimages%2Fxsprite3.pngR2i28263R3R11R5R13R6tgoR0y36:assets%2Fmusic%2Fmusic-goes-here.txtR2zR3R4R5R14R6tgoR0y36:assets%2Fsounds%2Fsounds-go-here.txtR2zR3R4R5R15R6tgoR2i2114R3y5:MUSICR5y26:flixel%2Fsounds%2Fbeep.mp3y9:pathGroupaR17y26:flixel%2Fsounds%2Fbeep.ogghR6tgoR2i39706R3R16R5y28:flixel%2Fsounds%2Fflixel.mp3R18aR20y28:flixel%2Fsounds%2Fflixel.ogghR6tgoR2i5794R3y5:SOUNDR5R19R18aR17R19hgoR2i33629R3R22R5R21R18aR20R21hgoR2i15744R3y4:FONTy9:classNamey35:__ASSET__flixel_fonts_nokiafc22_ttfR5y30:flixel%2Ffonts%2Fnokiafc22.ttfR6tgoR2i29724R3R23R24y36:__ASSET__flixel_fonts_monsterrat_ttfR5y31:flixel%2Ffonts%2Fmonsterrat.ttfR6tgoR0y33:flixel%2Fimages%2Fui%2Fbutton.pngR2i519R3R11R5R29R6tgoR0y36:flixel%2Fimages%2Flogo%2Fdefault.pngR2i3280R3R11R5R30R6tgh\",\"rootPath\":null,\"version\":2,\"libraryArgs\":[],\"libraryType\":null}";
+	var data = "{\"name\":null,\"assets\":\"aoy4:pathy34:assets%2Fdata%2Fdata-goes-here.txty4:sizezy4:typey4:TEXTy2:idR1y7:preloadtgoR0y28:assets%2Fdata%2FtestMap.ogmoR2i5952R3R4R5R7R6tgoR0y30:assets%2Fdata%2FtestStage.jsonR2i5556R3R4R5R8R6tgoR0y29:assets%2Fimages%2FbaDbone.pngR2i1899R3y5:IMAGER5R9R6tgoR0y28:assets%2Fimages%2Fbatton.pngR2i2112R3R10R5R11R6tgoR0y36:assets%2Fimages%2Fimages-go-here.txtR2zR3R4R5R12R6tgoR0y28:assets%2Fimages%2FmHCore.pngR2i444R3R10R5R13R6tgoR0y33:assets%2Fimages%2FtestTerrain.pngR2i978R3R10R5R14R6tgoR0y30:assets%2Fimages%2Fxsprite3.pngR2i28263R3R10R5R15R6tgoR0y36:assets%2Fmusic%2Fmusic-goes-here.txtR2zR3R4R5R16R6tgoR0y36:assets%2Fsounds%2Fsounds-go-here.txtR2zR3R4R5R17R6tgoR2i2114R3y5:MUSICR5y26:flixel%2Fsounds%2Fbeep.mp3y9:pathGroupaR19y26:flixel%2Fsounds%2Fbeep.ogghR6tgoR2i39706R3R18R5y28:flixel%2Fsounds%2Fflixel.mp3R20aR22y28:flixel%2Fsounds%2Fflixel.ogghR6tgoR2i5794R3y5:SOUNDR5R21R20aR19R21hgoR2i33629R3R24R5R23R20aR22R23hgoR2i15744R3y4:FONTy9:classNamey35:__ASSET__flixel_fonts_nokiafc22_ttfR5y30:flixel%2Ffonts%2Fnokiafc22.ttfR6tgoR2i29724R3R25R26y36:__ASSET__flixel_fonts_monsterrat_ttfR5y31:flixel%2Ffonts%2Fmonsterrat.ttfR6tgoR0y33:flixel%2Fimages%2Fui%2Fbutton.pngR2i519R3R10R5R31R6tgoR0y36:flixel%2Fimages%2Flogo%2Fdefault.pngR2i3280R3R10R5R32R6tgh\",\"rootPath\":null,\"version\":2,\"libraryArgs\":[],\"libraryType\":null}";
 	var manifest = lime_utils_AssetManifest.parse(data,ManifestResources.rootPath);
 	var library = lime_utils_AssetLibrary.fromManifest(manifest);
 	lime_utils_Assets.registerLibrary("default",library);
@@ -8371,6 +8432,7 @@ PlayState.prototype = $extend(flixel_FlxState.prototype,{
 	,map: null
 	,ground: null
 	,mhcore: null
+	,enemies: null
 	,create: function() {
 		flixel_FlxState.prototype.create.call(this);
 		this.map = new flixel_addons_editors_ogmo_FlxOgmo3Loader("assets/data/testMap.ogmo","assets/data/testStage.json");
@@ -8378,30 +8440,61 @@ PlayState.prototype = $extend(flixel_FlxState.prototype,{
 		this.ground.follow();
 		this.ground.setTileProperties(1,4369);
 		this.mhcore = new flixel_group_FlxTypedGroup();
+		this.enemies = new flixel_group_FlxTypedGroup();
 		this.player = new Player();
 		this.map.loadEntities($bind(this,this.placeEntities),"entities");
 		flixel_FlxG.camera.follow(this.player,flixel_FlxCameraFollowStyle.TOPDOWN_TIGHT);
 		this.add(this.ground);
 		this.add(this.player);
 		this.add(this.mhcore);
+		this.add(this.enemies);
 	}
 	,placeEntities: function(entity) {
-		if(entity.name == "X") {
-			this.player.setPosition(entity.x,entity.y);
-		} else if(entity.name == "MH_Core") {
-			this.mhcore.add(new MHCore(entity.x + 8,entity.y));
+		var x = entity.x;
+		var y = entity.y;
+		switch(entity.name) {
+		case "BaDbone":
+			this.enemies.add(new Enemy(x + 6,y,EnemyType.OVERSEER));
+			break;
+		case "Batton":
+			this.enemies.add(new Enemy(x + 6,y,EnemyType.MINIONS));
+			break;
+		case "MH_Core":
+			this.mhcore.add(new MHCore(x + 8,y));
+			break;
+		case "X":
+			this.player.setPosition(x,y);
+			break;
 		}
 	}
 	,itemTouched: function(player,mhcore) {
 		if(player.alive && player.exists && mhcore.alive && mhcore.exists) {
 			mhcore.kill();
+			player.health += 4;
 		}
+	}
+	,enemyTouched: function(player,enemies) {
+		var tmp = player.alive && player.exists && enemies.alive && enemies.exists;
+	}
+	,checkEnemyVision: function(enemy) {
+		if(this.ground.ray(this.player.getMidpoint(),enemy.getMidpoint()) && enemy.isOnScreen() == true) {
+			enemy.seesPlayer = true;
+			enemy.playerPosition = this.player.getPosition();
+		} else {
+			enemy.seesPlayer = false;
+		}
+	}
+	,kill: function() {
+		this.set_alive(false);
+		this.set_exists(false);
 	}
 	,update: function(elapsed) {
 		flixel_FlxState.prototype.update.call(this,elapsed);
 		flixel_FlxG.overlap(this.player,this.ground,null,flixel_FlxObject.separate);
 		flixel_FlxG.overlap(this.mhcore,this.ground,null,flixel_FlxObject.separate);
 		flixel_FlxG.overlap(this.player,this.mhcore,$bind(this,this.itemTouched));
+		flixel_FlxG.overlap(this.player,this.enemies,$bind(this,this.enemyTouched));
+		this.enemies.forEachAlive($bind(this,this.checkEnemyVision));
 	}
 	,__class__: PlayState
 });
@@ -8419,13 +8512,13 @@ var Player = function(x,y) {
 	this.animation.add("idle",[0,0,0,0,0,0,0,0,0,0,1,2,1,0,0,0,0,0,0,0,0,0,0,0,0],11,true);
 	this.animation.add("walking",[3],22,false);
 	this.animation.add("jump",[14,15,16],16,false);
-	this.animation.add("fall",[17],8);
-	this.animation.add("land",[19,20,21],8,false);
+	this.animation.add("fall",[17],12);
+	this.animation.add("dash",[41],8);
 	this.setSize(15,28);
 	this.offset.set(16,15);
-	this.drag.set_x(8000.);
+	this.drag.set_x(5400.);
 	this.acceleration.set_y(975.);
-	this.maxVelocity.set(100,0);
+	this.maxVelocity.set(150,0);
 };
 $hxClasses["Player"] = Player;
 Player.__name__ = "Player";
@@ -8433,16 +8526,17 @@ Player.__super__ = flixel_FlxSprite;
 Player.prototype = $extend(flixel_FlxSprite.prototype,{
 	_jumpTime: null
 	,_dashTime: null
+	,parent: null
 	,updateMovement: function() {
 		if(flixel_FlxG.keys.checkKeyArrayState([37],1)) {
 			this.set_facing(1);
-			this.acceleration.set_x(-this.drag.x);
+			this.velocity.set_x(-150.);
 		}
 		if(flixel_FlxG.keys.checkKeyArrayState([39],1)) {
 			this.set_facing(16);
-			this.acceleration.set_x(this.drag.x);
+			this.velocity.set_x(150);
 		}
-		if(Math.abs(this.acceleration.x) > 0 && this.velocity.y == 0) {
+		if(Math.abs(this.velocity.x) == 150 && this.velocity.y == 0) {
 			this.animation.append("walking",[4,5,6,7,8,9,10,11,12,13]);
 			this.animation.play("walking");
 		}
@@ -8474,6 +8568,40 @@ Player.prototype = $extend(flixel_FlxSprite.prototype,{
 		}
 		if((this.touching & 4096) > 0 && !flixel_FlxG.keys.checkKeyArrayState([88],2)) {
 			this._jumpTime = -1;
+		}
+		if(flixel_FlxG.keys.checkKeyArrayState([90],2) && (this.touching & 4096) > 0) {
+			this._dashTime = 0;
+		}
+		if(flixel_FlxG.keys.checkKeyArrayState([90],1) && this._dashTime >= 0) {
+			this._dashTime += flixel_FlxG.elapsed;
+			if(this._dashTime > 0.26) {
+				if(this.velocity.y != 0) {
+					switch(this.facing) {
+					case 1:
+						this.velocity.set_x(-450.);
+						break;
+					case 16:
+						this.velocity.set_x(450);
+						break;
+					}
+				} else {
+					this._dashTime = -1;
+				}
+			} else if(this._dashTime > 0) {
+				switch(this.facing) {
+				case 1:
+					this.velocity.set_x(-450.);
+					break;
+				case 16:
+					this.velocity.set_x(450);
+					break;
+				}
+			}
+		} else {
+			this._dashTime = -1;
+		}
+		if(!flixel_FlxG.keys.checkKeyArrayState([90],1) && this.velocity.y == 0) {
+			this._dashTime = -1;
 		}
 	}
 	,update: function(elapsed) {
@@ -39553,8 +39681,8 @@ $hxClasses["flixel.system.debug.interaction.tools.Eraser"] = flixel_system_debug
 flixel_system_debug_interaction_tools_Eraser.__name__ = "flixel.system.debug.interaction.tools.Eraser";
 flixel_system_debug_interaction_tools_Eraser.__super__ = flixel_system_debug_interaction_tools_Tool;
 flixel_system_debug_interaction_tools_Eraser.prototype = $extend(flixel_system_debug_interaction_tools_Tool.prototype,{
-	init: function(Brain) {
-		flixel_system_debug_interaction_tools_Tool.prototype.init.call(this,Brain);
+	init: function(Brain1) {
+		flixel_system_debug_interaction_tools_Tool.prototype.init.call(this,Brain1);
 		this._name = "Eraser";
 		return this;
 	}
@@ -78747,7 +78875,7 @@ var lime_utils_AssetCache = function() {
 	this.audio = new haxe_ds_StringMap();
 	this.font = new haxe_ds_StringMap();
 	this.image = new haxe_ds_StringMap();
-	this.version = 943136;
+	this.version = 34113;
 };
 $hxClasses["lime.utils.AssetCache"] = lime_utils_AssetCache;
 lime_utils_AssetCache.__name__ = "lime.utils.AssetCache";
@@ -118452,6 +118580,8 @@ openfl_display_DisplayObject.__tempStack = new lime_utils_ObjectPool(function() 
 AssetPaths.data_goes_here__txt = "assets/data/data-goes-here.txt";
 AssetPaths.testMap__ogmo = "assets/data/testMap.ogmo";
 AssetPaths.testStage__json = "assets/data/testStage.json";
+AssetPaths.baDbone__png = "assets/images/baDbone.png";
+AssetPaths.batton__png = "assets/images/batton.png";
 AssetPaths.images_go_here__txt = "assets/images/images-go-here.txt";
 AssetPaths.mHCore__png = "assets/images/mHCore.png";
 AssetPaths.testTerrain__png = "assets/images/testTerrain.png";
@@ -118528,9 +118658,11 @@ flixel_FlxObject._secondSeparateFlxRect = (function($this) {
 	$r = rect;
 	return $r;
 }(this));
+Enemy.SPEED = 60;
 openfl_text_Font.__fontByName = new haxe_ds_StringMap();
 openfl_text_Font.__registeredFonts = [];
-Player.SPEED = 100;
+Player.SPEED = 150;
+Player.DASH_SPEED = 450;
 Player.GRAVITY = 650;
 Player.JUMP_SPEED = 220;
 Xml.Element = 0;
