@@ -10,11 +10,16 @@ import flixel.tile.FlxTilemap;
 
 class PlayState extends FlxState
 {
+	var wincheck:Bool;
+	var losecheck:Bool;
 	var player:Player;
 	var map:FlxOgmo3Loader;
 	var ground:FlxTilemap;
 	var mhcore:FlxTypedGroup<MHCore>;
 	var enemies:FlxTypedGroup<Enemy>;
+	var hud:HUD;
+
+	var health:Int = 0;
 
 	override public function create()
 	{
@@ -27,6 +32,8 @@ class PlayState extends FlxState
 		mhcore = new FlxTypedGroup<MHCore>();
 		enemies = new FlxTypedGroup<Enemy>();
 
+		hud = new HUD();
+
 		player = new Player();
 		map.loadEntities(placeEntities, "entities");
 
@@ -35,6 +42,7 @@ class PlayState extends FlxState
 		add(player);
 		add(mhcore);
 		add(enemies);
+		add(hud);
 	}
 
 	function placeEntities(entity:EntityData)
@@ -60,7 +68,8 @@ class PlayState extends FlxState
 		if (player.alive && player.exists && mhcore.alive && mhcore.exists)
 		{
 			mhcore.kill();
-			player.health += 4;
+			health++;
+			hud.updateHUD(health);
 		}
 	}
 
@@ -68,7 +77,12 @@ class PlayState extends FlxState
 	{
 		if (player.alive && player.exists && enemies.alive && enemies.exists)
 		{
-			// player.kill(); [WIP] 
+			/*health--;
+				if (health == 0)			// [WIP]: needs decrease health condition and invincible after touch
+				{
+					player.kill();
+			}*/
+			player.kill();
 		}
 	}
 
@@ -99,6 +113,16 @@ class PlayState extends FlxState
 		FlxG.collide(mhcore, ground);
 		FlxG.overlap(player, mhcore, itemTouched);
 		FlxG.overlap(player, enemies, enemyTouched);
+		// [WIP]: import to a new function with death animation control
+		if (player.overlaps(enemies) /*player dies*/)
+		{
+			player.kill();
+			losecheck = true;
+		}
+		if (losecheck == true)
+		{
+			FlxG.switchState(new Gameover());
+		}
 
 		enemies.forEachAlive(checkEnemyVision);
 	}

@@ -70,5 +70,9 @@ class Enemy extends FlxSprite
 	{
 		super.update(elapsed);
 		brain.update(elapsed);
+		if (velocity.x != 0 || velocity.y != 0)
+		{
+			animation.play("moving");
+		}
 	}
 }
