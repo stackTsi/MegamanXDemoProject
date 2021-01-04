@@ -17,7 +17,6 @@ class Enemy extends FlxSprite
 	var type:EnemyType;
 
 	var brain:Brain;
-	var idleTime:Float;
 	var moveDirection:Float;
 
 	public var seesPlayer:Bool;
@@ -31,7 +30,6 @@ class Enemy extends FlxSprite
 		this.type = type;
 
 		brain = new Brain(idle);
-		idleTime = 0;
 		playerPosition = FlxPoint.get();
 		enemyPosition = FlxPoint.get();
 
@@ -62,7 +60,7 @@ class Enemy extends FlxSprite
 		}
 		else
 		{
-			FlxVelocity.moveTowardsPoint(this, playerPosition, SPEED);
+			FlxVelocity.moveTowardsPoint(this, playerPosition, Std.int(SPEED));
 		}
 	}
 

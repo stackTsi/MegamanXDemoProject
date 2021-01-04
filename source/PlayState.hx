@@ -10,7 +10,7 @@ import flixel.tile.FlxTilemap;
 
 class PlayState extends FlxState
 {
-	var wincheck:Bool;
+	var wincheck:Bool = false;
 	var losecheck:Bool;
 	var player:Player;
 	var map:FlxOgmo3Loader;
@@ -88,7 +88,8 @@ class PlayState extends FlxState
 
 	function checkEnemyVision(enemy:Enemy)
 	{
-		if ((ground.ray(player.getMidpoint(), enemy.getMidpoint())) && (enemy.isOnScreen() == true))
+		if ((ground.ray(player.getPosition(), enemy.getPosition()))
+			&& (enemy.isOnScreen() == true)) // [WIP] enemy and player hitbox not in contact if enemy gets behind player
 		{
 			enemy.seesPlayer = true;
 			enemy.playerPosition = player.getPosition();
@@ -114,14 +115,25 @@ class PlayState extends FlxState
 		FlxG.overlap(player, mhcore, itemTouched);
 		FlxG.overlap(player, enemies, enemyTouched);
 		// [WIP]: import to a new function with death animation control
-		if (player.overlaps(enemies) /*player dies*/)
+
+		if (player.overlaps(enemies))
+			/*player dies*/
 		{
 			player.kill();
 			losecheck = true;
 		}
+
 		if (losecheck == true)
 		{
 			FlxG.switchState(new Gameover());
+		}
+		if (health == 6)
+		{
+			wincheck = true;
+		}
+		if (wincheck == true)
+		{
+			FlxG.switchState(new WinState());
 		}
 
 		enemies.forEachAlive(checkEnemyVision);
